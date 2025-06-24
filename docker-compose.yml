@@ -29,6 +29,24 @@ services:
       interval: 5s
       retries: 5
 
+  gateway:
+    build: ./gateway
+    depends_on:
+      - postgres
+      - nats
+    environment:
+      NATS_URL: nats://nats:4222
+      PORT: 3000
+    ports:
+      - '3000:3000'
+
+  publisher:
+    image: andriiuni/events
+    depends_on:
+      - gateway
+    environment:
+      EVENT_ENDPOINT: http://gateway:3000/webhooks
+
 volumes:
   pg-data:
   nats-data:
