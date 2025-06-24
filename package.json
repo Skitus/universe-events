@@ -4,10 +4,35 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "lint": "eslint \"**/*.{ts,js,tsx}\" --config .eslintrc.cjs --max-warnings 0",
+    "format": "prettier --write .",
+    "test": "pnpm -r run test",
+    "prepare": "husky install"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "packageManager": "pnpm@10.12.3"
+  "packageManager": "pnpm@10.12.3",
+  "lint-staged": {
+    "**/*.{ts,js,tsx,json,md,yml}": [
+      "prettier --write",
+      "eslint --fix"
+    ]
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.4",
+    "@typescript-eslint/eslint-plugin": "^6.21.0",
+    "@typescript-eslint/parser": "^6.21.0",
+    "eslint": "^8.57.1",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-config-prettier": "^10.1.5",
+    "eslint-import-resolver-typescript": "^4.4.3",
+    "eslint-plugin-import": "^2.32.0",
+    "eslint-plugin-prettier": "^5.5.0",
+    "husky": "^8.0.0",
+    "lint-staged": "^16.1.2",
+    "prettier": "^3.6.0",
+    "prettier-plugin-packagejson": "^2.5.15",
+    "typescript": "^5.3.3"
+  }
 }

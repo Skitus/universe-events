@@ -1,0 +1,9 @@
+{
+  "files": [],
+  "references": [
+    { "path": "./gateway" },
+    { "path": "./fb-collector" },
+    { "path": "./ttk-collector" },
+    { "path": "./reporter" }
+  ]
+}

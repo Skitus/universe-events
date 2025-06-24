@@ -1,22 +1,20 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-
-describe('AppController', () => {
-  let appController: AppController;
-
-  beforeEach(async () => {
-    const app: TestingModule = await Test.createTestingModule({
-      controllers: [AppController],
-      providers: [AppService],
-    }).compile();
-
-    appController = app.get<AppController>(AppController);
-  });
-
-  describe('root', () => {
-    it('should return "Hello World!"', () => {
-      expect(appController.getHello()).toBe('Hello World!');
-    });
-  });
-});
+/** @type {import('eslint').Linter.Config} */
+module.exports = {
+  root: true,
+  env: { node: true, es2022: true },
+  parser: '@typescript-eslint/parser',
+  parserOptions: { project: ['./tsconfig.json'], tsconfigRootDir: __dirname },
+  plugins: ['@typescript-eslint', 'import', 'prettier'],
+  extends: [
+    'airbnb-base',
+    'plugin:@typescript-eslint/recommended',
+    'plugin:import/typescript',
+    'plugin:prettier/recommended',
+  ],
+  ignorePatterns: ['dist', 'node_modules'],
+  rules: {
+    'import/extensions': 'off',
+    'class-methods-use-this': 'off',
+    'prettier/prettier': ['error'],
+  },
+};
