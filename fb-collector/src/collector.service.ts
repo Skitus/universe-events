@@ -7,9 +7,6 @@ import { PrismaService } from './prisma.service';
 export class CollectorService implements OnModuleInit {
   private readonly log = new Logger(CollectorService.name);
 
-  private savedCount = 0;
-  private readonly sampleLimit = Number(process.env.SAMPLE_LIMIT ?? 2);
-
   constructor(
     private readonly nats: NatsClient,
     private readonly prisma: PrismaService,
@@ -20,11 +17,6 @@ export class CollectorService implements OnModuleInit {
 
     const subject = process.env.NATS_SUBJECT ?? 'events.facebook.>';
     this.nats.subscribe(subject, async (raw, hdrs) => {
-      if (this.savedCount >= this.sampleLimit) {
-        this.log.log(`ℹ️ Sample limit reached (${this.sampleLimit}), skipping event`);
-        return;
-      }
-
       let ev;
       try {
         ev = eventSchema.parse(raw);
@@ -51,10 +43,9 @@ export class CollectorService implements OnModuleInit {
         },
       });
 
-      this.savedCount += 1;
-      this.log.debug(`✅ saved ${ev.eventId} (count ${this.savedCount}/${this.sampleLimit})`);
+      this.log.debug(`✅ saved event ${ev.eventId}`);
     });
 
-    this.log.log(`Subscribed on ${subject} (sampleMode limit = ${this.sampleLimit})`);
+    this.log.log(`Subscribed on ${subject}`);
   }
 }
