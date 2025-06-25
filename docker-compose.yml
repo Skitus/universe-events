@@ -1,3 +1,5 @@
+version: '3.8'
+
 services:
   postgres:
     image: postgres:15-alpine
@@ -31,19 +33,44 @@ services:
 
   gateway:
     build: ./gateway
+    container_name: gateway
+    env_file: ./gateway/.env
     depends_on:
-      - postgres
-      - nats
-    environment:
-      NATS_URL: nats://nats:4222
-      PORT: 3000
+      postgres:
+        condition: service_healthy
+      nats:
+        condition: service_healthy
     ports:
       - '3000:3000'
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:3000/health/live']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  fb-collector:
+    build: ./fb-collector
+    container_name: fb-collector
+    env_file: ./fb-collector/.env
+    depends_on:
+      postgres:
+        condition: service_healthy
+      nats:
+        condition: service_healthy
+    ports:
+      - '3002:3002'
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:3002/health/live']
+      interval: 10s
+      retries: 5
 
   publisher:
     image: andriiuni/events
+    container_name: publisher
     depends_on:
-      - gateway
+      gateway:
+        condition: service_healthy
     environment:
       EVENT_ENDPOINT: http://gateway:3000/webhooks
 

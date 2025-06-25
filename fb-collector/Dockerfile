@@ -1,0 +1,16 @@
+FROM node:18-alpine
+
+WORKDIR /app
+
+COPY package.json pnpm-lock.yaml ./
+RUN corepack enable \
+ && corepack prepare pnpm@10.12.3 --activate \
+ && pnpm install --prod --frozen-lockfile
+
+COPY . .
+
+RUN pnpm prisma generate --schema=prisma/schema.prisma
+
+RUN pnpm run build
+
+CMD ["pnpm", "start:prod"]

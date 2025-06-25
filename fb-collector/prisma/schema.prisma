@@ -1,0 +1,21 @@
+generator client {
+  provider = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl-arm64-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model FacebookEvent {
+  id            String   @id @default(cuid())
+  eventId       String   
+  timestamp     DateTime @db.Timestamptz(3)
+  source        String
+  funnelStage   String
+  eventType     String
+  data          Json
+  correlationId String?  @db.Uuid
+  createdAt     DateTime @default(now())
+}
