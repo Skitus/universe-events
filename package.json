@@ -13,6 +13,12 @@
     "dev": "concurrently \"pnpm --filter gateway run start:dev\" \"pnpm --filter fb-collector run start:dev\" \"pnpm --filter ttk-collector run start:dev\" \"pnpm --filter reporter run start:dev\"",
     "start": "pnpm run prepare:all && pnpm run dev"
   },
+  "lint-staged": {
+  "**/*.{ts,js,tsx}": [
+    "eslint --fix",
+    "prettier --write"
+  ]
+},
   "devDependencies": {
     "@types/node": "^24.0.4",
     "@typescript-eslint/eslint-plugin": "^6.21.0",
