@@ -1,9 +1,10 @@
 {
   "files": [],
   "references": [
-    { "path": "./gateway" },
-    { "path": "./fb-collector" },
-    { "path": "./ttk-collector" },
-    { "path": "./reporter" }
+    { "path": "shared" },
+    { "path": "gateway" },
+    { "path": "fb-collector" }
+    // { "path": "ttk-collector" },
+    // { "path": "reporter" }
   ]
 }

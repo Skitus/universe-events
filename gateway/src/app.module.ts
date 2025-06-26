@@ -1,5 +1,5 @@
-import { Module, OnModuleInit } from '@nestjs/common';
-import { NatsClient } from './nats.client';
+import { Module } from '@nestjs/common';
+import { NatsClient } from '@universe/shared';
 import { WebhookController } from './webhook.controller';
 import { HealthController } from './health.controller';
 
@@ -7,10 +7,4 @@ import { HealthController } from './health.controller';
   controllers: [WebhookController, HealthController],
   providers: [NatsClient],
 })
-export class AppModule implements OnModuleInit {
-  constructor(private readonly nats: NatsClient) {}
-
-  async onModuleInit() {
-    await this.nats.connect();
-  }
-}
+export class AppModule {}

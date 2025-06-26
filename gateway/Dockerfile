@@ -1,39 +1,38 @@
-# gateway/Dockerfile
-
+# === builder stage ===
 FROM node:18-alpine AS builder
-
-# 1) Build stage
 WORKDIR /app
 
-# install dependencies
-COPY package.json pnpm-lock.yaml ./
+# 1) Копируем конфигурацию воркспейса и lockfile
+COPY pnpm-workspace.yaml pnpm-lock.yaml ./
+
+# 2) Копируем пакет shared, чтобы pnpm зарегистрировал его как workspace-пакет
+COPY shared ./shared
+
+# 3) Копируем package.json только для gateway
+COPY gateway/package.json ./
+
+# 4) Устанавливаем продакшен-зависимости (включая @universe/shared)
 RUN corepack enable \
  && corepack prepare pnpm@10.12.3 --activate \
- && pnpm install --frozen-lockfile
+ && pnpm install --prod --no-frozen-lockfile
 
-# copy source and compile
-COPY . .
+# 5) Копируем исходники gateway и собираем
+COPY gateway ./
 RUN pnpm run build
 
-# 2) Runtime stage
-FROM node:18-alpine
-
+# === runtime stage ===
+FROM node:18-alpine AS runner
 WORKDIR /app
-
-# for healthchecks
 RUN apk add --no-cache curl
 
-# copy only what's needed
-COPY --from=builder /app/package.json /app/pnpm-lock.yaml ./
+# 6) Копируем в рантайм: только нужные артефакты
+COPY --from=builder /app/package.json ./
+COPY --from=builder /app/pnpm-lock.yaml ./
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/dist ./dist
 
-# expose port
 EXPOSE 3000
-
-# built-in healthcheck (optional, you can remove if you keep it in docker-compose)
 HEALTHCHECK --interval=10s --timeout=5s --start-period=5s --retries=3 \
   CMD curl -f http://localhost:3000/health/live || exit 1
 
-# launch
-CMD ["node", "dist/main"]
+CMD ["node", "dist/main.js"]

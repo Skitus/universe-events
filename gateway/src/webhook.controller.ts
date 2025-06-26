@@ -1,7 +1,6 @@
 import { Body, Controller, Headers, Post } from '@nestjs/common';
 import { randomUUID } from 'crypto';
-import { eventSchema, EventDto } from './event.schema';
-import { NatsClient } from './nats.client';
+import { EventDto, EventsSchema, NatsClient } from '@universe/shared';
 
 @Controller('webhooks')
 export class WebhookController {
@@ -9,7 +8,7 @@ export class WebhookController {
 
   @Post()
   async handle(@Body() body: unknown, @Headers('x-correlation-id') cid?: string) {
-    const parsed = eventSchema.parse(body);
+    const parsed = EventsSchema.parse(body);
     const events: EventDto[] = Array.isArray(parsed) ? parsed : [parsed];
 
     const correlationId = cid ?? randomUUID();
