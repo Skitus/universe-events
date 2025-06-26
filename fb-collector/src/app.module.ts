@@ -1,6 +1,5 @@
 import { Module } from '@nestjs/common';
-import { PrismaService } from './prisma.service';
-import { NatsClient } from './nats.client';
+import { NatsClient, PrismaService } from '@universe/shared';
 import { CollectorService } from './collector.service';
 import { HealthController } from './health.controller';
 

@@ -1,7 +1,5 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
-import { NatsClient } from './nats.client';
-import { eventSchema } from './event.schema';
-import { PrismaService } from './prisma.service';
+import { EventDto, EventsSchema, PrismaService, NatsClient } from '@universe/shared';
 
 @Injectable()
 export class CollectorService implements OnModuleInit {
@@ -13,39 +11,53 @@ export class CollectorService implements OnModuleInit {
   ) {}
 
   async onModuleInit(): Promise<void> {
-    await this.nats.connect();
-
     const subject = process.env.NATS_SUBJECT ?? 'events.facebook.>';
-    this.nats.subscribe(subject, async (raw, hdrs) => {
-      let ev;
-      try {
-        ev = eventSchema.parse(raw);
-      } catch (err) {
-        this.log.error('❌ Invalid event schema, skipping message', (err as Error).message);
-        return;
-      }
 
-      const ts = new Date(ev.timestamp);
-      if (Number.isNaN(ts.getTime())) {
-        this.log.error(`❌ Invalid timestamp "${ev.timestamp}" for event ${ev.eventId}, skipping`);
-        return;
-      }
+    // Ждём завершения инициализации NatsClient перед подпиской
+    await this.nats.initializationPromise; // Используем публичный геттер
 
-      await this.prisma.facebookEvent.create({
-        data: {
-          eventId: ev.eventId,
-          timestamp: ts,
-          source: ev.source,
-          funnelStage: ev.funnelStage,
-          eventType: ev.eventType,
-          data: ev.data as object,
-          correlationId: hdrs['x-correlation-id'] ?? null,
-        },
+    try {
+      await this.nats.subscribe(subject, async (raw, hdrs) => {
+        let events: EventDto[];
+        try {
+          const parsed = EventsSchema.parse(raw);
+          events = Array.isArray(parsed) ? parsed : [parsed];
+        } catch (err) {
+          this.log.error('❌ Invalid event schema, skipping message', (err as Error).message);
+          return;
+        }
+
+        // Используем Promise.all для асинхронных операций в цикле
+        await Promise.all(
+          events.map(async (ev) => {
+            const ts = new Date(ev.timestamp);
+            if (Number.isNaN(ts.getTime())) {
+              this.log.error(
+                `❌ Invalid timestamp "${ev.timestamp}" for event ${ev.eventId}, skipping`,
+              );
+              return;
+            }
+
+            await this.prisma.facebookEvent.create({
+              data: {
+                eventId: ev.eventId,
+                timestamp: ts,
+                source: ev.source,
+                funnelStage: ev.funnelStage,
+                eventType: ev.eventType,
+                data: ev.data as object,
+                correlationId: hdrs['x-correlation-id'] ?? null,
+              },
+            });
+
+            this.log.debug(`✅ saved event ${ev.eventId}`);
+          }),
+        );
       });
 
-      this.log.debug(`✅ saved event ${ev.eventId}`);
-    });
-
-    this.log.log(`Subscribed on ${subject}`);
+      this.log.log(`Subscribed on ${subject}`);
+    } catch (err) {
+      this.log.error('Failed to subscribe:', err);
+    }
   }
 }

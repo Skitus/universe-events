@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "target": "ES2023",
+    "module": "commonjs",
+    "declaration": true,
+    "sourceMap": true,
+    "strict": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "baseUrl": ".",
+    "paths": {
+      "@universe/shared": ["shared/dist"],
+      "@universe/shared/*": ["shared/dist/*"]
+    },
+    "moduleResolution": "node"
+  }
+}
