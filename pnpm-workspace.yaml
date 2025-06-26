@@ -2,7 +2,7 @@ packages:
   - shared
   - gateway
   - fb-collector
-  # - ttk-collector
+  - ttk-collector
   # - reporter
 
 onlyBuiltDependencies:

@@ -1,5 +1,5 @@
 -- CreateTable
-CREATE TABLE "FacebookEvent" (
+CREATE TABLE "Event" (
     "id" TEXT NOT NULL,
     "eventId" TEXT NOT NULL,
     "timestamp" TIMESTAMPTZ(3) NOT NULL,
@@ -10,8 +10,5 @@ CREATE TABLE "FacebookEvent" (
     "correlationId" UUID,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
-    CONSTRAINT "FacebookEvent_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "Event_pkey" PRIMARY KEY ("id")
 );
-
--- CreateIndex
-CREATE UNIQUE INDEX "FacebookEvent_eventId_key" ON "FacebookEvent"("eventId");

@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
 import { NatsClient, PrismaService } from '@universe/shared';
-import { CollectorService } from './collector.service';
+import { FacebookCollectorService } from './collector.service';
 import { HealthController } from './health.controller';
 
 @Module({
   controllers: [HealthController],
-  providers: [PrismaService, NatsClient, CollectorService],
+  providers: [PrismaService, NatsClient, FacebookCollectorService],
 })
-export class AppModule {}
+export class FacebookCollectorModule {}

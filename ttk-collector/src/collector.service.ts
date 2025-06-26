@@ -1,9 +1,9 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
-import { EventDto, EventsSchema, PrismaService, NatsClient } from '@universe/shared';
+import { EventDto, EventsSchema, NatsClient, PrismaService } from '@universe/shared'; 
 
 @Injectable()
-export class FacebookCollectorService implements OnModuleInit {
-  private readonly log = new Logger(FacebookCollectorService.name);
+export class TtkCollectorService implements OnModuleInit {
+  private readonly log = new Logger(TtkCollectorService.name);
 
   constructor(
     private readonly nats: NatsClient,
@@ -11,14 +11,14 @@ export class FacebookCollectorService implements OnModuleInit {
   ) {}
 
   async onModuleInit(): Promise<void> {
-    const subject = process.env.NATS_SUBJECT ?? 'events.facebook.>';
+    const subject = process.env.NATS_SUBJECT ?? 'events.tiktok.>';
 
-    // Ждём завершения инициализации NatsClient перед подпиской
-    await this.nats.initializationPromise; // Используем публичный геттер
+    await this.nats.initializationPromise;
 
     try {
       await this.nats.subscribe(subject, async (raw, hdrs) => {
         let events: EventDto[];
+
         try {
           const parsed = EventsSchema.parse(raw);
           events = Array.isArray(parsed) ? parsed : [parsed];
@@ -27,7 +27,6 @@ export class FacebookCollectorService implements OnModuleInit {
           return;
         }
 
-        // Используем Promise.all для асинхронных операций в цикле
         await Promise.all(
           events.map(async (ev) => {
             const ts = new Date(ev.timestamp);

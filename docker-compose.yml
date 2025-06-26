@@ -71,6 +71,26 @@ services:
       retries: 5
       start_period: 5s
 
+  ttk-collector:
+    build:
+      context: .
+      dockerfile: ttk-collector/Dockerfile
+    container_name: ttk-collector
+    env_file: ttk-collector/.env
+    depends_on:
+      postgres:
+        condition: service_healthy
+      nats:
+        condition: service_healthy
+    ports:
+      - '3004:3004'
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:3004/health/live']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+
   publisher:
     image: andriiuni/events
     container_name: publisher
