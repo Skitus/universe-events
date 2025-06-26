@@ -34,7 +34,9 @@ services:
   gateway:
     build:
       context: .
-      dockerfile: gateway/Dockerfile
+      dockerfile: Dockerfile
+      args:
+        SERVICE_DIR: "gateway"
     container_name: gateway
     env_file: gateway/.env
     depends_on:
@@ -54,7 +56,9 @@ services:
   fb-collector:
     build:
       context: .
-      dockerfile: fb-collector/Dockerfile
+      dockerfile: Dockerfile
+      args:
+        SERVICE_DIR: "fb-collector"
     container_name: fb-collector
     env_file: fb-collector/.env
     depends_on:
@@ -74,7 +78,9 @@ services:
   ttk-collector:
     build:
       context: .
-      dockerfile: ttk-collector/Dockerfile
+      dockerfile: Dockerfile
+      args:
+        SERVICE_DIR: "ttk-collector"
     container_name: ttk-collector
     env_file: ttk-collector/.env
     depends_on:

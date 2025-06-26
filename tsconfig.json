@@ -3,8 +3,8 @@
   "references": [
     { "path": "shared" },
     { "path": "gateway" },
-    { "path": "fb-collector" }
-    // { "path": "ttk-collector" },
+    { "path": "fb-collector" },
+    { "path": "ttk-collector" },
     // { "path": "reporter" }
   ]
 }
