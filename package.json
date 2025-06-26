@@ -1,24 +1,24 @@
 {
   "name": "universe-events",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "private": true,
   "scripts": {
     "lint": "eslint \"**/*.{ts,js,tsx}\" --config .eslintrc.cjs --max-warnings 0",
     "format": "prettier --write .",
     "test": "pnpm -r run test",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "prisma:generate": "pnpm --filter fb-collector run prisma:generate && pnpm --filter ttk-collector run prisma:generate",
+    "build": "pnpm run prisma:generate && pnpm --filter shared run build && pnpm -r --filter '{gateway,fb-collector,ttk-collector,reporter}' run build",
+    "prepare:all": "pnpm install && pnpm run build",
+    "dev": "concurrently \"pnpm --filter gateway run start:dev\" \"pnpm --filter fb-collector run start:dev\" \"pnpm --filter ttk-collector run start:dev\" \"pnpm --filter reporter run start:dev\"",
+    "start": "pnpm run prepare:all && pnpm run dev"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "packageManager": "pnpm@10.12.3",
   "lint-staged": {
-    "**/*.{ts,js,tsx,json,md,yml}": [
-      "prettier --write",
-      "eslint --fix"
-    ]
-  },
+  "**/*.{ts,js,tsx}": [
+    "eslint --fix",
+    "prettier --write"
+  ]
+},
   "devDependencies": {
     "@types/node": "^24.0.4",
     "@typescript-eslint/eslint-plugin": "^6.21.0",
@@ -33,6 +33,8 @@
     "lint-staged": "^16.1.2",
     "prettier": "^3.6.0",
     "prettier-plugin-packagejson": "^2.5.15",
-    "typescript": "^5.3.3"
-  }
+    "typescript": "^5.3.3",
+    "concurrently": "^8.0.0"
+  },
+  "packageManager": "pnpm@10.12.3+sha512.467df2c586056165580ad6dfb54ceaad94c5a30f80893ebdec5a44c5aa73c205ae4a5bb9d5ed6bb84ea7c249ece786642bbb49d06a307df218d03da41c317417"
 }

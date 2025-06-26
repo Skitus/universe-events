@@ -1,0 +1,111 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: pg
+    environment:
+      POSTGRES_USER: dev
+      POSTGRES_PASSWORD: dev
+      POSTGRES_DB: events
+    ports:
+      - '5433:5432'
+    volumes:
+      - pg-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U dev']
+      interval: 10s
+      retries: 5
+
+  nats:
+    image: nats:2.10-alpine
+    container_name: nats
+    command: ['-js', '-sd', '/data', '-m', '8222']
+    ports:
+      - '4222:4222'
+      - '8222:8222'
+    volumes:
+      - nats-data:/data
+    healthcheck:
+      test: ['CMD-SHELL', 'wget -qO- http://localhost:8222/healthz || exit 1']
+      interval: 5s
+      retries: 5
+
+  gateway:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        SERVICE_DIR: "gateway"
+    container_name: gateway
+    env_file: gateway/.env
+    depends_on:
+      postgres:
+        condition: service_healthy
+      nats:
+        condition: service_healthy
+    ports:
+      - '3000:3000'
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:3000/health/live']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+
+  fb-collector:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        SERVICE_DIR: "fb-collector"
+    container_name: fb-collector
+    env_file: fb-collector/.env
+    depends_on:
+      postgres:
+        condition: service_healthy
+      nats:
+        condition: service_healthy
+    ports:
+      - '3002:3002'
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:3002/health/live']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+
+  ttk-collector:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        SERVICE_DIR: "ttk-collector"
+    container_name: ttk-collector
+    env_file: ttk-collector/.env
+    depends_on:
+      postgres:
+        condition: service_healthy
+      nats:
+        condition: service_healthy
+    ports:
+      - '3004:3004'
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:3004/health/live']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+
+  publisher:
+    image: andriiuni/events
+    container_name: publisher
+    depends_on:
+      gateway:
+        condition: service_healthy
+    environment:
+      EVENT_ENDPOINT: http://gateway:3000/webhooks
+
+volumes:
+  pg-data:
+  nats-data:

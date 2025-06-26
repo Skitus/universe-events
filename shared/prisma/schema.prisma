@@ -1,0 +1,20 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Event {
+  id            String   @id @default(cuid())
+  eventId       String   
+  timestamp     DateTime @db.Timestamptz(3)
+  source        String
+  funnelStage   String
+  eventType     String
+  data          Json
+  correlationId String?  @db.Uuid
+  createdAt     DateTime @default(now())
+}

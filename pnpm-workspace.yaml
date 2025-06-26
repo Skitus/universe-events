@@ -1,0 +1,14 @@
+packages:
+  - shared
+  - gateway
+  - fb-collector
+  - ttk-collector
+  # - reporter
+
+onlyBuiltDependencies:
+  - '@nestjs/core'
+  - '@prisma/client'
+  - '@prisma/engines'
+  - '@swc/core'
+  - prisma
+  - unrs-resolver

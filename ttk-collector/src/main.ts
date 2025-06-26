@@ -1,8 +1,8 @@
 import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
+import { TtkCollectorModule } from './ttk.module';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
-  await app.listen(process.env.PORT ?? 3002);
+  const app = await NestFactory.create(TtkCollectorModule);
+  await app.listen(process.env.PORT ?? 3004);
 }
 bootstrap();
