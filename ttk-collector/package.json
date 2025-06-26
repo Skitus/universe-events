@@ -1,12 +1,15 @@
 {
-  "name": "fb-collector",
+  "name": "ttk-collector",
   "version": "0.0.1",
+  "description": "",
+  "author": "",
   "private": true,
+  "license": "UNLICENSED",
   "scripts": {
     "build": "nest build",
     "start:dev": "nest start --watch",
     "start:prod": "node dist/fb-collector/src/main.js",
-  "prisma:generate": "prisma generate --schema=../shared/prisma/schema.prisma"
+    "prisma:generate": "prisma generate --schema=../shared/prisma/schema.prisma"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",
